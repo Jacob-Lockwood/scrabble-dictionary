@@ -1,9 +1,8 @@
 # Experimental!
-H ~ "git: github.com/uiua-lang/webua" ~ NotFound ResHTML Response Serve!
+H ~ "git: github.com/uiua-lang/webua" ~ ! HtmlResp NotFound Response Serve!
 
-C  ← ⊂"class="repr⍜▽⋅@\s⊸=@\n
-Id ← ⊂"id="repr
-Index ← ResHTML H!(
+C ← !Class ⍜▽⋅@\s⊸=@\n
+Index ← HtmlResp H!(
   Html {
     Head {
       Title "Scrabble Dictionary"
@@ -29,7 +28,7 @@ Index ← ResHTML H!(
           }
         }
         Div {
-          Id "display"
+          !Id "display"
           P "Enter a query to see words"
         }
       }
@@ -49,9 +48,9 @@ WordList ← (
   ▽⊸≡◇(⧻regex) ¤⊙Words $"^_$"⌵URLDecode
   =0°⊏ ⍜⊙□₃⍚⌞▽± ⟜°⊏ ⊕⊃⧻□⊸≡◇⧻
   # ∩⌞▽±⊸≡◇⧻ °˜⊏⊕□⊸≡◇⧻
-  ResHTML H!(
+  HtmlResp H!(
     Ul⍚(
-      Li Details {⍥!open ⊙⊓(Summary $"_-letter words (_ found)"|Ul⍚Li)}
+      Li Details {⨬""(!open"true") ⊙⊓(Summary $"_-letter words (_ found)"|Ul⍚Li)}
     )
   )
 )
@@ -62,7 +61,7 @@ Route ← ⍣(
 | ⍩WordList °$"/words?q=_"
 | NotFound
 )
-Serve!(Route)
+Serve!(Route) 8080
 
 # °utf₈ Words "a.*z"
 
