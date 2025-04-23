@@ -70,10 +70,20 @@ WordList ← HtmlResp (
 WordDefinition ← HtmlResp Layout /◇⊂H!{⊃(
     H₂
   | P ⬚"not a playable word"⊏⊙Definitions⊗⊙Words□
-  | A {⊃(
-        C"underline"
-      | !href$"https://www.collinsdictionary.com/dictionary/english/_"¯
-      | "Read full definition")}
+  | A {
+      C"underline"
+      !target "_blank"
+      ⊃(!href$"https://www.collinsdictionary.com/dictionary/english/_"
+      | "Read full definition"
+      )¯
+    }
+  | A {
+      C"underline"
+      !target "_blank"
+      ⊃(!href$"https://www.google.com/search?q=_&udm=2"
+      | $"View google images of _"
+      )¯
+    }
   )}
 
 CSS ← Response "200 OK" "text/css" &frab"./out.css"
