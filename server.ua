@@ -2,7 +2,8 @@
 H ~ "git: github.com/uiua-lang/webua" ~ ! HtmlResp NotFound Response Serve!
 
 C ← !Class ⍜▽⋅@\s⊸=@\n
-Index ← HtmlResp H!(
+
+Layout ← H!(
   Html {
     Head {
       Title "Scrabble Dictionary"
@@ -16,27 +17,31 @@ Index ← HtmlResp H!(
       C"font-serif bg-red-500 min-h-screen"
       Div {
         C"bg-red-50 p-4 my-20 mx-auto max-w-4xl flex flex-col gap-2"
-        H₁{C"text-red-800 text-4xl font-bold" "Scrabble Dictionary"}
+        H₁{
+          C"text-red-800 text-4xl font-bold"
+          A{!href"/" "Scrabble Dictionary"}
+        }
         Form {
-          HXGet "/words" HXSwap "innerHTML" HXTarget "#display"
+          !action"/words" !method"get"
           Div {
             C $ flex font-mono gap-1 border-solid border-2 border-red-300 bg-red-100 p-2 w-full
-              $ focus-within:shadow-md shadow-red-400 before:content-['/^']
-              $ before:text-red-500 after:text-red-500 after:content-['$/i']
-            Input {!name"q" !type "text" C$"w-[_ch] outline-none autofill:transition-colors autofill:duration-[5000000ms]" ⧻⟜!placeholder "Enter regular expression"}
-            Button {!type "submit" ""}
+              $ focus-within:shadow-md shadow-red-400 before:content-['/']
+              $ before:text-red-500 after:text-red-500 after:content-['/i']
+            Input {
+              !name"q"
+              !type "text"
+              !placeholder"Enter regular expression"
+              C $ w-[24ch] outline-none autofill:transition-colors autofill:duration-[5000000ms]
+            }
           }
         }
-        Div {
-          !Id "display"
-          P "Enter a query to see words"
-        }
+        ∘
       }
     }
   }
 )
 
-CSS ← Response "200 OK" "text/css" &frab"./out.css"
+Index ← HtmlResp Layout H~P "Enter a query to see words."
 
 URLDecode ← ⍜⊜∘≡(+@\0⌝⊥16⇌⊗⊙HexDigits¯↘1)⊸⦷"%\W\W"
 
@@ -44,21 +49,40 @@ URLDecode ← ⍜⊜∘≡(+@\0⌝⊥16⇌⊗⊙HexDigits¯↘1)⊸⦷"%\W\W"
 Words       ←
 Definitions ←
 
-WordList ← (
-  ▽⊸≡◇(⧻regex) ¤⊙Words $"^_$"⌵URLDecode
-  =0°⊏ ⍜⊙□₃⍚⌞▽± ⟜°⊏ ⊕⊃⧻□⊸≡◇⧻
-  # ∩⌞▽±⊸≡◇⧻ °˜⊏⊕□⊸≡◇⧻
-  HtmlResp H!(
-    Ul⍚(
-      Li Details {⨬""(!open"true") ⊙⊓(Summary $"_-letter words (_ found)"|Ul⍚Li)}
+WordList ← HtmlResp (
+  ▽⊸≡◇(/∨≡⌟◇≍≡⊢⊸regex) ¤⊙Words ⌵URLDecode
+  ?↧2⊸⧻
+  H!⨬(
+    Layout P "No words found"
+  | ¯⌵⊢
+    Html Head $$ <meta http-equiv="refresh" content="0; url=/words/_" />
+  | =0°⊏ ⍜⊙□₃⍚⌞▽± ⟜°⊏ ⊕⊃⧻□⊸≡◇⧻
+    Layout Ul⍚(
+      Li Details {⊓(
+          ⨬(""|"open=1")
+        | Summary $"_-letter words (_ found)"
+        | Ul⍚(Li A {!href⊸$"/words/_" ¯})
+        )}
     )
   )
 )
 
+WordDefinition ← HtmlResp Layout /◇⊂H!{⊃(
+    H₂
+  | P ⬚"not a playable word"⊏⊙Definitions⊗⊙Words□
+  | A {⊃(
+        C"underline"
+      | !href$"https://www.collinsdictionary.com/dictionary/english/_"¯
+      | "Read full definition")}
+  )}
+
+CSS ← Response "200 OK" "text/css" &frab"./out.css"
+
 Route ← ⍣(
-  Index°"/"
-| CSS°"/out.css"
+  CSS°"/out.css"
+| Index°"/"
 | ⍩WordList °$"/words?q=_"
+| ⍩WordDefinition ⌵°$"/words/_"
 | NotFound
 )
 Serve!(Route) 8080
