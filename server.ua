@@ -11,7 +11,6 @@ Layout ← H!(
   Html {
     Head {
       Title "Scrabble Dictionary"
-      Script {!src "https://unpkg.com/htmx.org@2.0.4"}
       Link {!href "/out.css" !rel "stylesheet"}
       $ <link rel="preconnect" href="https://fonts.googleapis.com">
       $ <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
