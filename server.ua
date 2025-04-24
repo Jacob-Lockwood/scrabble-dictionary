@@ -2,7 +2,7 @@
 H ~ "git: github.com/uiua-lang/webua" ~ ! HtmlResp Response Serve! Tags!
 
 C ← !Class ⍜▽⋅@\s⊸=@\n
-Tags!(Code)
+# Tags!(Code)
 
 # ? href text
 ExtA ← H~A {C"underline" !target"_blank" !href ⊙∘}
