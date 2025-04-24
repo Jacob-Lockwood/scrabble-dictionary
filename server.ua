@@ -1,11 +1,13 @@
 # Experimental!
-H ~ "git: github.com/uiua-lang/webua" ~ ! HtmlResp NotFound Response Serve! Tags!
+H ~ "git: github.com/uiua-lang/webua" ~ ! HtmlResp Response Serve! Tags!
 
 C ← !Class ⍜▽⋅@\s⊸=@\n
 Tags!(Code)
 
 # ? href text
 ExtA ← H~A {C"underline" !target"_blank" !href ⊙∘}
+# ? href text
+IntA ← H~A {C"underline" !href ⊙∘}
 
 Layout ← H!(
   Html {
@@ -84,7 +86,7 @@ WordList ← H!(
         Li Details {⊓(
             ⨬(""|"open=1")
           | Summary $"_-letter words (_ found)"
-          | Ul⍚(Li A {!href⊸$"/words/_" ¯})
+          | Ul⍚(Li IntA⊸$"/words/_" ¯)
           )}
       )
     ))
@@ -107,6 +109,10 @@ WordDefinition ← HtmlResp Layout ⊃⌵(
 
 CSS     ← Response "200 OK" "text/css" &frab"./out.css"
 Favicon ← Response "200 OK" "image/x-icon" &frab"./favicon.ico"
+NotFound ← (
+  Layout "" H!(P $"That page wasn't found. _" IntA "/" "Home")
+  Response "404 Not Found" "text/html" utf₈
+)
 
 Route ← ⍣(
   CSS°"/out.css"
