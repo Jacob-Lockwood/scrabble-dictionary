@@ -1,7 +1,11 @@
 # Experimental!
-H ~ "git: github.com/uiua-lang/webua" ~ ! HtmlResp NotFound Response Serve!
+H ~ "git: github.com/uiua-lang/webua" ~ ! HtmlResp NotFound Response Serve! Tags!
 
 C ← !Class ⍜▽⋅@\s⊸=@\n
+Tags!(Code)
+
+# ? href text
+ExtA ← H~A {C"underline" !target"_blank" !href ⊙∘}
 
 Layout ← H!(
   Html {
@@ -27,21 +31,41 @@ Layout ← H!(
             C $ flex font-mono gap-1 border-solid border-2 border-red-300 bg-red-100 p-2 w-full
               $ focus-within:shadow-md shadow-red-400 before:content-['/']
               $ before:text-red-500 after:text-red-500 after:content-['/i']
+            !onclick"q.focus()"
             Input {
-              !name"q"
+              !Id⟜!name"q"
               !type "text"
-              !placeholder"Enter regular expression"
-              C $ w-[24ch] outline-none autofill:transition-colors autofill:duration-[5000000ms]
+              !placeholder"Enter word or pattern"
+              C $ w-[21ch] outline-none autofill:transition-colors autofill:duration-[5000000ms]
+              !value∘
             }
           }
         }
-        ∘
+        ⊙∘
       }
     }
   }
 )
 
-Index ← HtmlResp Layout H~P "Enter a query to see words."
+Index ← HtmlResp Layout "" /◇⊂H!{
+  Div {C "h-12"}
+  H₂ {C"font-bold" ∘} $ About this site
+  P {
+    $$ This is a dictionary searchable by _
+    ExtA "https://www.regexone.com/" "regular expressions."
+    $  The words come from the official Collin's Scrabble list.
+  }
+  P $ Note that queries are case-insensitive; that is, uppercase and lowercase
+    $ letters are treated identically.
+  # ,P $ Below follows a short reference for searching using regular expressions:
+  # Table {
+  #   Tr {Th "Pattern" Th "Meaning"}
+
+  #   Tr {Td Code ".*" Td "Any word"}
+  #   Tr {Td Code "AB.*" Td "AB- followed by anything"}
+  #   Tr {Td Code ".*CD" Td "-CD preceded by anything"}
+  # }
+}
 
 URLDecode ← ⍜⊜∘≡(+@\0⌝⊥16⇌⊗⊙HexDigits¯↘1)⊸⦷"%\W\W"
 
@@ -49,64 +73,48 @@ URLDecode ← ⍜⊜∘≡(+@\0⌝⊥16⇌⊗⊙HexDigits¯↘1)⊸⦷"%\W\W"
 Words       ←
 Definitions ←
 
-WordList ← HtmlResp (
-  ▽⊸≡◇(/∨≡⌟◇≍≡⊢⊸regex) ¤⊙Words ⌵URLDecode
-  ?↧2⊸⧻
-  H!⨬(
-    Layout P "No words found"
-  | ¯⌵⊢
-    Html Head $$ <meta http-equiv="refresh" content="0; url=/words/_" />
-  | =0°⊏ ⍜⊙□₃⍚⌞▽± ⟜°⊏ ⊕⊃⧻□⊸≡◇⧻
-    Layout Ul⍚(
-      Li Details {⊓(
-          ⨬(""|"open=1")
-        | Summary $"_-letter words (_ found)"
-        | Ul⍚(Li A {!href⊸$"/words/_" ¯})
-        )}
-    )
-  )
+WordList ← H!(
+  ⌵URLDecode
+  HtmlResp Layout⟜(
+    ↧2⊸⧻ ⨬(▽⊸≡◇(/∨≡⌟◇≍≡⊢⊸regex)¤⊙Words|□₁) /×⊸±
+    ⨬(P "No words found"
+    | ¯⊢
+      $$ <meta http-equiv="refresh" content="0; url=/words/_" />
+    | =0°⊏ ⍜⊙□₃⍚⌞▽± ⟜°⊏ ⊕⊃⧻□⊸≡◇⧻
+      Ul⍚(
+        Li Details {⊓(
+            ⨬(""|"open=1")
+          | Summary $"_-letter words (_ found)"
+          | Ul⍚(Li A {!href⊸$"/words/_" ¯})
+          )}
+      )
+    ))
 )
 
-WordDefinition ← HtmlResp Layout /◇⊂H!{⊃(
-    H₂
-  | P ⬚"not a playable word"⊏⊙Definitions⊗⊙Words□
-  | A {
-      C"underline"
-      !target "_blank"
-      ⊃(!href$"https://www.collinsdictionary.com/dictionary/english/_"
+WordDefinition ← HtmlResp Layout ⊃⌵(
+  /◇⊂H!{
+    ⊃(H₂
+    | P ⬚"not a playable word"⊏⊙Definitions⊗⊙Words□
+    | ExtA⊃(
+        $"https://www.collinsdictionary.com/dictionary/english/_"
       | "Read full definition"
       )¯
-    }
-  | A {
-      C"underline"
-      !target "_blank"
-      ⊃(!href$"https://www.google.com/search?q=_&udm=2"
+    | ExtA⊃(
+        $"https://www.google.com/search?q=_&udm=2"
       | $"View google images of _"
       )¯
-    }
-  )}
+    )}
+)
 
-CSS ← Response "200 OK" "text/css" &frab"./out.css"
+CSS     ← Response "200 OK" "text/css" &frab"./out.css"
+Favicon ← Response "200 OK" "image/x-icon" &frab"./favicon.ico"
 
 Route ← ⍣(
   CSS°"/out.css"
+| Favicon°"/favicon.ico"
 | Index°"/"
 | ⍩WordList °$"/words?q=_"
 | ⍩WordDefinition ⌵°$"/words/_"
 | NotFound
 )
 Serve!(Route) 8080
-
-# °utf₈ Words "a.*z"
-
-# G! ←^ ⋅""
-# G!(
-#   "Enter regular expression here"
-#   ‼Input(
-#     Name="q"
-#     Type="text"
-#     Class=($"w-[_ch] outline-none"⧻)
-#     Placeholder=(∘)
-#   )
-#   ‼Input(Name "q"|Type "text"|Class $"w-[_ch] outline-none")
-# )
