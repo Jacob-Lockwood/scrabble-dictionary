@@ -14,12 +14,15 @@ Layout ← H!(
     Head {
       Title "Scrabble Dictionary"
       Link {!href "/out.css" !rel "stylesheet"}
+      $ <meta charset="UTF-8">
+      $ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      $ <meta http-equiv="X-UA-Compatible" content="ie=edge">
       $ <link rel="preconnect" href="https://fonts.googleapis.com">
       $ <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
       $ <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&display=swap" rel="stylesheet">
     }
     Body {
-      C"font-serif bg-red-500 min-h-screen"
+      C"font-serif bg-red-500 min-h-screen px-2"
       Div {
         C"bg-red-50 p-4 my-20 mx-auto max-w-4xl flex flex-col gap-2"
         H₁{
